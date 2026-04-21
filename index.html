@@ -30,19 +30,40 @@
 
     }
 
-    #chat {
+  
 
-      flex: 1;
+    
+#chat {
 
-      overflow-y: auto;
+  flex: 1;
 
-      padding: 10px;
+  overflow-y: auto;
 
-      display: flex;
+  padding: 10px;
 
-      flex-direction: column;
+  display: flex;
 
-    }
+  flex-direction: column;
+
+  justify-content: flex-start;
+
+
+}
+
+  
+
+
+
+
+      
+
+    
+
+      
+
+      
+
+    
 
     .msg {
 
@@ -156,7 +177,13 @@
 
       // scroll down
 
-      chat.scrollTop = chat.scrollHeight;
+      chat.scrollTo({
+
+  top: chat.scrollHeight,
+
+  behavior: "smooth"
+
+});
 
       // call your API
 
