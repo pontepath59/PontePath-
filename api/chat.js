@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     const { message } = req.body;
     c
 
-    if (!messages) {
+    if (!message) {
 
       return res.status(400).json({ error: "No messages provided" });
 
