@@ -29,6 +29,7 @@
     }
 
     #
+
 #chat {
 
   flex: 1;
@@ -37,6 +38,8 @@
 
   padding: 15px;
 
+  padding-bottom: 80px; /* 👈 prevents overlap */
+
   display: flex;
 
   flex-direction: column;
@@ -44,6 +47,9 @@
   justify-content: flex-end;
 
 }
+  
+
+
     
 
     .msg {
@@ -74,29 +80,33 @@
 
     }
 
+    #
+
+      
+
+      
+
+    
+
     #inputArea {
 
-      display: flex;
+  display: flex;
 
-      padding: 10px;
+  padding: 10px;
 
-      background: black;
+  background: black;
 
-    }
+  position: fixed;   /* 👈 THIS is the key */
 
-    #input {
+  bottom: 0;
 
-      flex: 1;
+  left: 0;
 
-      padding: 12px;
+  width: 100%;
 
-      border-radius: 10px;
+}
 
-      border: none;
-
-      font-size: 16px;
-
-    }
+    
 
     button {
 
