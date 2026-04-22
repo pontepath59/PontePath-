@@ -4,121 +4,115 @@
 
 <head>
 
-<title>PontePath</title>
+  <title>PontePath</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<style>
+  <style>
 
-body {
+    body {
 
-  margin: 0;
+      margin: 0;
 
-  font-family: Arial, sans-serif;
+      font-family: Arial;
 
-  background: linear-gradient(#1a1a2e, #16213e);
+      background: linear-gradient(#1a1a2e, #16213e);
 
-  color: white;
+      color: white;
 
-  display: flex;
+      height: 100vh;
 
-  flex-direction: column;
+      display: flex;
 
-  height: 100dvh;
+      flex-direction: column;
 
-}
+    }
 
-#chat {
+    #chat {
 
-  flex: 1;
+      flex: 1;
 
-  overflow-y: auto;
+      overflow-y: auto;
 
-  padding: 15px;
+      padding: 15px;
 
-  display: flex;
+      display: flex;
 
-  flex-direction: column;
+      flex-direction: column;
 
-  justify-content: flex-end;
+    }
 
-  gap: 10px;
+    .msg {
 
-}
+      max-width: 75%;
 
-.msg {
+      padding: 12px;
 
-  max-width: 75%;
+      border-radius: 12px;
 
-  padding: 12px;
+      margin-bottom: 10px;
 
-  border-radius: 16px;
+      line-height: 1.4;
 
-  line-height: 1.4;
+    }
 
-  word-wrap: break-word;
+    .user {
 
-}
+      align-self: flex-end;
 
-.user {
+      background: #5b7cff;
 
-  align-self: flex-end;
+    }
 
-  background: #4f7cff;
+    .bot {
 
-}
+      align-self: flex-start;
 
-.bot {
+      background: #2c2c2c;
 
-  align-self: flex-start;
+    }
 
-  background: #2a2a2a;
+    #inputArea {
 
-}
+      display: flex;
 
-#inputArea {
+      padding: 10px;
 
-  display: flex;
+      background: black;
 
-  padding: 10px;
+    }
 
-  background: black;
+    input {
 
-}
+      flex: 1;
 
-#input {
+      padding: 12px;
 
-  flex: 1;
+      border-radius: 10px;
 
-  padding: 12px;
+      border: none;
 
-  border-radius: 10px;
+      font-size: 16px;
 
-  border: none;
+    }
 
-  font-size: 16px;
+    button {
 
-  outline: none;
+      margin-left: 10px;
 
-}
+      padding: 12px 16px;
 
-button {
+      border-radius: 10px;
 
-  margin-left: 10px;
+      border: none;
 
-  padding: 12px 16px;
+      background: gold;
 
-  border: none;
+      font-weight: bold;
 
-  border-radius: 10px;
+    }
 
-  background: #f4d03f;
-
-  font-weight: bold;
-
-}
-
-</style>
+  </style>
 
 </head>
 
@@ -130,13 +124,15 @@ button {
 
   <input id="input" placeholder="What’s on your heart?" />
 
-  <button onclick="send()">Send</button>
+  <button onclick="sendMessage()">Send</button>
 
 </div>
 
 <script>
 
-async function send() {
+let chatHistory = [];
+
+async function sendMessage() {
 
   const input = document.getElementById("input");
 
@@ -146,6 +142,8 @@ async function send() {
 
   if (!message) return;
 
+  // show user message
+
   const userMsg = document.createElement("div");
 
   userMsg.className = "msg user";
@@ -154,9 +152,9 @@ async function send() {
 
   chat.appendChild(userMsg);
 
-  input.value = "";
+  chatHistory.push({ role: "user", content: message });
 
-  chat.scrollTop = chat.scrollHeight;
+  input.value = "";
 
   try {
 
@@ -170,11 +168,17 @@ async function send() {
 
       },
 
-      body: JSON.stringify({ message })
+      body: JSON.stringify({
+
+        messages: chatHistory
+
+      })
 
     });
 
     const data = await res.json();
+
+    if (!res.ok) throw new Error();
 
     const botMsg = document.createElement("div");
 
@@ -184,19 +188,21 @@ async function send() {
 
     chat.appendChild(botMsg);
 
+    chatHistory.push({ role: "assistant", content: data.reply });
+
+    chat.scrollTop = chat.scrollHeight;
+
   } catch (err) {
 
     const errorMsg = document.createElement("div");
 
     errorMsg.className = "msg bot";
 
-    errorMsg.innerText = "Something went wrong.";
+    errorMsg.innerText = "I'm having trouble responding right now. Please try again.";
 
     chat.appendChild(errorMsg);
 
   }
-
-  chat.scrollTop = chat.scrollHeight;
 
 }
 
