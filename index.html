@@ -211,3 +211,28 @@ async function sendMessage() {
 </body>
 
 </html>
+const response = await fetch("/api/chat", {
+
+  method: "POST",
+
+  headers: {
+
+    "Content-Type": "application/json"
+
+  },
+
+  body: JSON.stringify({
+
+    messages: [
+
+      { role: "system", content: "You are a supportive faith-based AI assistant." },
+
+      { role: "user", content: message }
+
+    ]
+
+  })
+
+});
+
+const data = await response.json();
