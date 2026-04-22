@@ -4,31 +4,29 @@
 
 <head>
 
-  <title>PontePath</title>
+<title>PontePath</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
+<style>
 
-    body {
+body {
 
-      margin: 0;
+  margin: 0;
 
-      font-family: Arial;
+  font-family: Arial, sans-serif;
 
-      background: linear-gradient(#1a1a2e, #16213e);
+  background: linear-gradient(#1a1a2e, #16213e);
 
-      color: white;
+  color: white;
 
-      display: flex;
+  display: flex;
 
-      flex-direction: column;
+  flex-direction: column;
 
-      height: 100dvh;
+  height: 100dvh;
 
-    }
-
-    #
+}
 
 #chat {
 
@@ -38,57 +36,47 @@
 
   padding: 15px;
 
-  padding-bottom: 80px; /* 👈 prevents overlap */
-
   display: flex;
 
   flex-direction: column;
 
   justify-content: flex-end;
 
+  gap: 10px;
+
 }
-  
 
+.msg {
 
-    
+  max-width: 75%;
 
-    .msg {
+  padding: 12px;
 
-      max-width: 75%;
+  border-radius: 16px;
 
-      padding: 12px;
+  line-height: 1.4;
 
-      border-radius: 16px;
+  word-wrap: break-word;
 
-      line-height: 1.4;
+}
 
-    }
+.user {
 
-    .user {
+  align-self: flex-end;
 
-      align-self: flex-end;
+  background: #4f7cff;
 
-      background: #4f7cff;
+}
 
-    }
+.bot {
 
-    .bot {
+  align-self: flex-start;
 
-      align-self: flex-start;
+  background: #2a2a2a;
 
-      background: #2a2a2a;
+}
 
-    }
-
-    #
-
-      
-
-      
-
-    
-
-    #inputArea {
+#inputArea {
 
   display: flex;
 
@@ -96,113 +84,123 @@
 
   background: black;
 
-  position: fixed;   /* 👈 THIS is the key */
+}
 
-  bottom: 0;
+#input {
 
-  left: 0;
+  flex: 1;
 
-  width: 100%;
+  padding: 12px;
+
+  border-radius: 10px;
+
+  border: none;
+
+  font-size: 16px;
+
+  outline: none;
 
 }
 
-    
+button {
 
-    button {
+  margin-left: 10px;
 
-      margin-left: 10px;
+  padding: 12px 16px;
 
-      padding: 12px 16px;
+  border: none;
 
-      border: none;
+  border-radius: 10px;
 
-      border-radius: 10px;
+  background: #f4d03f;
 
-      background: #f4d03f;
+  font-weight: bold;
 
-      font-weight: bold;
+}
 
-    }
-
-  </style>
+</style>
 
 </head>
 
 <body>
 
-  <div id="chat"></div>
+<div id="chat"></div>
 
-  <div id="inputArea">
+<div id="inputArea">
 
-    <input id="input" placeholder="What’s on your heart?" />
+  <input id="input" placeholder="What’s on your heart?" />
 
-    <button onclick="send()">Send</button>
+  <button onclick="send()">Send</button>
 
-  </div>
+</div>
 
-  <script>
+<script>
 
-    async function send() {
+async function send() {
 
-      const input = document.getElementById("input");
+  const input = document.getElementById("input");
 
-      const chat = document.getElementById("chat");
+  const chat = document.getElementById("chat");
 
-      const message = input.value.trim();
+  const message = input.value.trim();
 
-      if (!message) return;
+  if (!message) return;
 
-      // user message
+  const userMsg = document.createElement("div");
 
-      const userMsg = document.createElement("div");
+  userMsg.className = "msg user";
 
-      userMsg.className = "msg user";
+  userMsg.innerText = message;
 
-      userMsg.innerText = message;
+  chat.appendChild(userMsg);
 
-      chat.appendChild(userMsg);
+  input.value = "";
 
-      input.value = "";
+  chat.scrollTop = chat.scrollHeight;
 
-      // scroll
+  try {
 
-      chat.scrollTop = chat.scrollHeight;
+    const res = await fetch("/api/chat", {
 
-      // call API
+      method: "POST",
 
-      const res = await fetch("/api/chat", {
+      headers: {
 
-        method: "POST",
+        "Content-Type": "application/json"
 
-        headers: {
+      },
 
-          "Content-Type": "application/json"
+      body: JSON.stringify({ message })
 
-        },
+    });
 
-        body: JSON.stringify({ message })
+    const data = await res.json();
 
-      });
+    const botMsg = document.createElement("div");
 
-      const data = await res.json();
+    botMsg.className = "msg bot";
 
-      // bot message
+    botMsg.innerText = data.reply;
 
-      const botMsg = document.createElement("div");
+    chat.appendChild(botMsg);
 
-      botMsg.className = "msg bot";
+  } catch (err) {
 
-      botMsg.innerText = data.reply;
+    const errorMsg = document.createElement("div");
 
-      chat.appendChild(botMsg);
+    errorMsg.className = "msg bot";
 
-      // scroll again
+    errorMsg.innerText = "Something went wrong.";
 
-      chat.scrollTop = chat.scrollHeight;
+    chat.appendChild(errorMsg);
 
-    }
+  }
 
-  </script>
+  chat.scrollTop = chat.scrollHeight;
+
+}
+
+</script>
 
 </body>
 
