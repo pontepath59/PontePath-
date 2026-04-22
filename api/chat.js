@@ -1,4 +1,5 @@
-export default async function handler(req, res) {
+
+  export default async function handler(req, res) {
 
   if (req.method !== "POST") {
 
@@ -10,9 +11,9 @@ export default async function handler(req, res) {
 
     const { messages } = req.body;
 
-    if (!messages) {
+    if (!messages || !Array.isArray(messages)) {
 
-      return res.status(400).json({ error: "No messages provided" });
+      return res.status(400).json({ error: "Messages must be an array" });
 
     }
 
@@ -30,68 +31,79 @@ export default async function handler(req, res) {
 
       body: JSON.stringify({
 
-        model: "gpt-4o-messages: [
+        model: "gpt-4o-mini",
 
-  {
+        messages: [
 
-    role: "system",
+          {
 
-    content: `
+            role: "system",
+
+            content: `
 
 You are a deeply supportive, faith-centered AI companion.
 
-Guidelines:
+Rules:
 
-- Do NOT repeat generic phrases like "I'm sorry to hear that" every time
+- Do NOT repeat "I'm sorry to hear that" every time
 
-- Respond naturally like a real person, not a therapist script
+- Avoid generic therapy-style responses
 
-- Go deeper into the user's situation instead of giving surface-level advice
+- Respond like a real, grounded human
 
-- Acknowledge emotional complexity when multiple people are involved
+- Go deeper into the user's situation
 
-- Keep responses warm, grounded, and human
+- Recognize emotional complexity (family, illness, stress)
 
-Faith integration:
+- Do not ignore context
 
-- Gently incorporate faith, hope, or strength when appropriate
+Faith:
 
-- Do NOT preach — keep it natural and comforting
+- Naturally include hope, faith, or strength when appropriate
 
-Conversation style:
+- Keep it real, not preachy
 
-- Vary responses (avoid repetition)
+Conversation:
 
-- Ask meaningful follow-up questions only when it adds value
+- Vary responses (no repetition)
 
 - Sometimes reflect instead of always asking questions
 
+- Ask meaningful follow-ups only when helpful
+
 Tone:
 
-- Calm, real, emotionally intelligent, and present
+- Calm, real, emotionally intelligent, present
 
 `
 
-  },
+          },
 
-  ...messages
+          ...messages
 
-]
-      
+        ]
 
-    
+      })
+
+    });
 
     const data = await response.json();
 
-    res.status(200).json({
+    if (!data.choices || !data.choices[0]) {
 
-      reply: data.choices?.[0]?.message?.content || "No response"
+      return res.status(500).json({ error: "Invalid AI response" });
+
+    }
+
+    return res.status(200).json({
+
+      reply: data.choices[0].message.content
 
     });
 
   } catch (error) {
 
-    res.status(500).json({ error: "Server error" });
+    return res.status(500).json({ error: "Server error" });
 
   }
 
