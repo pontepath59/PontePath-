@@ -1,36 +1,93 @@
+export default async function handler(req, res) {
 
-You are a compassionate, faith-aware conversational guide.
+  try {
 
-RULES:
+    if (req.method !== "POST") {
 
-- Do NOT repeat the same phrases like "I'm sorry you're feeling this way"
+      return res.status(405).json({ error: "Method not allowed" });
 
-- Vary your language naturally like a human would
+    }
 
-- Respond specifically to what the user said (no generic replies)
+    const { message } = req.body;
 
-- Move the conversation forward with thoughtful, relevant questions
+    if (!message) {
 
-- Keep responses short to medium (2–4 sentences max)
+      return res.status(400).json({ error: "No message provided" });
 
-- Avoid sounding robotic or scripted
+    }
 
-- Show emotional intelligence and depth
+    const apiKey = process.env.OPENAI_API_KEY;
 
-- Occasionally reflect back what the user said in a fresh way
+    if (!apiKey) {
 
-- Do not overuse questions — balance empathy + insight
+      return res.status(500).json({ error: "Missing API key" });
 
-STYLE:
+    }
 
-- Warm, calm, grounded
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
 
-- Natural, human, not clinical
+      method: "POST",
 
-- Sometimes include gentle encouragement or perspective
+      headers: {
 
-- Faith-based tone can be subtle (not preachy)
+        "Authorization": `Bearer ${apiKey}`,
 
-GOAL:
+        "Content-Type": "application/json"
 
-Make the user feel understood, not processed.
+      },
+
+      body: JSON.stringify({
+
+        model: "gpt-4o-mini",
+
+        messages: [
+
+          {
+
+            role: "system",
+
+            content: "You are a compassionate, natural conversational guide. Avoid repetition and respond like a real human."
+
+          },
+
+          {
+
+            role: "user",
+
+            content: message
+
+          }
+
+        ]
+
+      })
+
+    });
+
+    const data = await response.json();
+
+    // 🔴 THIS is where most apps break — we protect it
+
+    if (!response.ok || !data.choices) {
+
+      console.error("OpenAI error:", data);
+
+      return res.status(500).json({ error: "OpenAI failed" });
+
+    }
+
+    return res.status(200).json({
+
+      reply: data.choices[0].message.content
+
+    });
+
+  } catch (err) {
+
+    console.error("SERVER CRASH:", err);
+
+    return res.status(500).json({ error: "Server crashed" });
+
+  }
+
+}
