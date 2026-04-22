@@ -8,19 +8,11 @@ export default async function handler(req, res) {
 
     }
 
-    const { message } = req.body;
+    const { messages } = req.body;
 
-    if (!message) {
+    if (!messages) {
 
-      return res.status(400).json({ error: "No message provided" });
-
-    }
-
-    const apiKey = process.env.OPENAI_API_KEY;
-
-    if (!apiKey) {
-
-      return res.status(500).json({ error: "Missing API key" });
+      return res.status(400).json({ error: "No messages provided" });
 
     }
 
@@ -30,7 +22,7 @@ export default async function handler(req, res) {
 
       headers: {
 
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
 
         "Content-Type": "application/json"
 
@@ -46,19 +38,29 @@ export default async function handler(req, res) {
 
             role: "system",
 
-            content: "You are a compassionate, natural conversational guide. Avoid repetition and respond like a real human."
+            content: `
+
+You are a compassionate, emotionally intelligent conversational guide.
+
+- Remember context from earlier messages
+
+- Never act confused if topic is clear
+
+- Avoid repeating phrases
+
+- Respond like a real human, not scripted
+
+- Keep responses natural and supportive
+
+`
 
           },
 
-          {
+          ...messages
 
-            role: "user",
+        ],
 
-            content: message
-
-          }
-
-        ]
+        temperature: 0.7
 
       })
 
@@ -66,11 +68,9 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // 🔴 THIS is where most apps break — we protect it
-
     if (!response.ok || !data.choices) {
 
-      console.error("OpenAI error:", data);
+      console.error(data);
 
       return res.status(500).json({ error: "OpenAI failed" });
 
@@ -84,7 +84,7 @@ export default async function handler(req, res) {
 
   } catch (err) {
 
-    console.error("SERVER CRASH:", err);
+    console.error("SERVER ERROR:", err);
 
     return res.status(500).json({ error: "Server crashed" });
 
