@@ -2,7 +2,23 @@ export default function Home() {
 
   return (
 
-    <div style={{ padding: 20 }}>
+    <div style={{
+
+      display: "flex",
+
+      justifyContent: "center",
+
+      alignItems: "center",
+
+      height: "100vh",
+
+      fontFamily: "Arial",
+
+      flexDirection: "column",
+
+      textAlign: "center"
+
+    }}>
 
       <h1>PontePath</h1>
 
