@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 
 export default function PontePathApp() {
@@ -195,11 +194,7 @@ export default function PontePathApp() {
 
         ))}
 
-        {isTyping && (
-
-          <div style={styles.typing}>...</div>
-
-        )}
+        {isTyping && <div style={styles.typing}>...</div>}
 
         <div ref={messagesEndRef} />
 
@@ -245,9 +240,7 @@ const styles = {
 
     background: "#0f172a",
 
-    color: "white",
-
-    fontFamily: "sans-serif"
+    color: "white"
 
   },
 
@@ -273,9 +266,7 @@ const styles = {
 
     borderRadius: 12,
 
-    maxWidth: "80%",
-
-    lineHeight: 1.4
+    maxWidth: "80%"
 
   },
 
@@ -291,9 +282,7 @@ const styles = {
 
     display: "flex",
 
-    padding: 10,
-
-    borderTop: "1px solid #1e293b"
+    padding: 10
 
   },
 
@@ -305,9 +294,7 @@ const styles = {
 
     borderRadius: 10,
 
-    border: "none",
-
-    outline: "none"
+    border: "none"
 
   },
 
@@ -319,11 +306,9 @@ const styles = {
 
     borderRadius: 10,
 
-    border: "none",
-
     background: "#facc15",
 
-    fontWeight: "bold"
+    border: "none"
 
   },
 
@@ -367,13 +352,11 @@ const styles = {
 
     borderRadius: 10,
 
-    border: "none",
-
     background: "#6C63FF",
 
-    color: "white",
+    border: "none",
 
-    fontSize: 16
+    color: "white"
 
   }
 
