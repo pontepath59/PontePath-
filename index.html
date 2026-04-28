@@ -6,7 +6,7 @@
 
   <title>PontePath</title>
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
 
@@ -20,11 +20,11 @@
 
       color: white;
 
-      height: 100vh;
-
       display: flex;
 
       flex-direction: column;
+
+      height: 100vh;
 
     }
 
@@ -40,6 +40,8 @@
 
       flex-direction: column;
 
+      gap: 10px;
+
     }
 
     .msg {
@@ -48,9 +50,7 @@
 
       padding: 12px;
 
-      border-radius: 12px;
-
-      margin-bottom: 10px;
+      border-radius: 16px;
 
       line-height: 1.4;
 
@@ -58,17 +58,17 @@
 
     .user {
 
-      align-self: flex-end;
+      background: #5c7cfa;
 
-      background: #5b7cff;
+      align-self: flex-end;
 
     }
 
     .bot {
 
-      align-self: flex-start;
+      background: #2d2d2d;
 
-      background: #2c2c2c;
+      align-self: flex-start;
 
     }
 
@@ -78,11 +78,11 @@
 
       padding: 10px;
 
-      background: black;
+      background: #000;
 
     }
 
-    input {
+    #input {
 
       flex: 1;
 
@@ -92,21 +92,19 @@
 
       border: none;
 
-      font-size: 16px;
-
     }
 
     button {
 
       margin-left: 10px;
 
-      padding: 12px 16px;
+      padding: 12px 18px;
 
-      border-radius: 10px;
+      background: #f5d142;
 
       border: none;
 
-      background: gold;
+      border-radius: 10px;
 
       font-weight: bold;
 
@@ -136,13 +134,13 @@ async function sendMessage() {
 
   const input = document.getElementById("input");
 
-  const chat = document.getElementById("chat");
-
   const message = input.value.trim();
 
   if (!message) return;
 
-  // show user message
+  const chat = document.getElementById("chat");
+
+  // USER MESSAGE
 
   const userMsg = document.createElement("div");
 
@@ -152,13 +150,13 @@ async function sendMessage() {
 
   chat.appendChild(userMsg);
 
-  chatHistory.push({ role: "user", content: message });
-
   input.value = "";
+
+  chatHistory.push({ role: "user", content: message });
 
   try {
 
-    const res = await fetch("/api/chat", {
+    const response = await fetch("/api/chat", {
 
       method: "POST",
 
@@ -170,21 +168,19 @@ async function sendMessage() {
 
       body: JSON.stringify({
 
-        messages: chatHistory
+        messages: chatHistory.slice(-8) // short memory
 
       })
 
     });
 
-    const data = await res.json();
-
-    if (!res.ok) throw new Error();
+    const data = await response.json();
 
     const botMsg = document.createElement("div");
 
     botMsg.className = "msg bot";
 
-    botMsg.innerText = data.reply;
+    botMsg.innerText = data.reply || "Something went wrong.";
 
     chat.appendChild(botMsg);
 
@@ -194,13 +190,13 @@ async function sendMessage() {
 
   } catch (err) {
 
-    const errorMsg = document.createElement("div");
+    const botMsg = document.createElement("div");
 
-    errorMsg.className = "msg bot";
+    botMsg.className = "msg bot";
 
-    errorMsg.innerText = "I'm having trouble responding right now. Please try again.";
+    botMsg.innerText = "Connection issue. Try again.";
 
-    chat.appendChild(errorMsg);
+    chat.appendChild(botMsg);
 
   }
 
@@ -211,28 +207,3 @@ async function sendMessage() {
 </body>
 
 </html>
-const response = await fetch("/api/chat", {
-
-  method: "POST",
-
-  headers: {
-
-    "Content-Type": "application/json"
-
-  },
-
-  body: JSON.stringify({
-
-    messages: [
-
-      { role: "system", content: "You are a supportive faith-based AI assistant." },
-
-      { role: "user", content: message }
-
-    ]
-
-  })
-
-});
-
-const data = await response.json();
