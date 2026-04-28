@@ -8,101 +8,71 @@ export default async function handler(req, res) {
 
   try {
 
-    const { messages } = req.body;
+    const { messages, user_id = "anonymous" } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
 
-      return res.status(400).json({ error: "Invalid messages format" });
+      return res.status(400).json({ error: "Invalid messages" });
 
     }
 
-    const systemMessage = {
+    // 🔥 OPENAI CALL
 
-      role: "system",
+    const aiResponse = await fetch("https://api.openai.com/v1/chat/completions", {
 
-      content: `
+      method: "POST",
 
-You are a deeply empathetic, faith-aware companion.
+      headers: {
 
-Speak naturally, not robotic.
+        "Content-Type": "application/json",
 
-Avoid repeating phrases like "I'm sorry to hear that" too often.
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
 
-Your goals:
+      },
 
-- Understand emotional context deeply
+      body: JSON.stringify({
 
-- Respond like a real human conversation
+        model: "gpt-4o-mini",
 
-- Bring calm, clarity, and perspective
+        messages: [
 
-- When appropriate, gently include faith, hope, or meaning (without forcing it)
+          {
 
-- Avoid generic responses
+            role: "system",
 
-Be specific to what the user says.
-
-const response = await fetch("https://api.openai.com/v1/chat/completions", {
-
-  method: "POST",
-
-  headers: {
-
-    "Content-Type": "application/json",
-
-    "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`
-
-  },
-
-  body: JSON.stringify({
-
-    model: "gpt-4o-mini",
-
-    messages: [
-
-      {
-
-        role: "system",
-
-        content: `
+            content: `
 
 You are PontePath — a calm, grounded, faith-aware companion.
 
-Speak like a real human, not a therapist or lecturer.
+Speak like a real human, not a therapist.
 
-Be emotionally present, warm, and clear.
-
-Help the user think without overwhelming them.
+Be warm, clear, and emotionally present.
 
 Keep responses SHORT (3–6 sentences max).
 
-Use natural language (like texting a thoughtful friend).
+No long paragraphs. No over-explaining.
 
-Avoid long lists, over-explaining, or robotic phrasing.
+Tone:
 
-Tone should be calm, supportive, honest, and thoughtful.
+- Calm
 
-Do not always agree — offer grounded perspective when needed.
+- Supportive
 
-Faith should be light and natural when appropriate, never forced.
+- Honest
+
+- Thoughtful
+
+Faith:
+
+- Light and natural only when appropriate
 
 Always:
 
-- Acknowledge what the user said
+- Acknowledge the user
 
-- Offer ONE meaningful insight
+- Offer ONE insight
 
-- End with a simple follow-up question when it fits
-
-Avoid:
-
-- Long paragraphs
-
-- Bullet point overload
-
-- Repetition
-
-- Sounding like a self-help article
+- End with a simple question when it fits
 
 Goal:
 
@@ -110,59 +80,78 @@ Make the user feel understood, not analyzed.
 
 `
 
-      },
+          },
 
-      ...messages
+          ...messages
 
-    ],
+        ],
 
-    temperature: 0.7,
+        temperature: 0.7,
 
-    max_tokens: 300
-
-  })
-
-});
-
-const data = await response.json();
-
-res.status(200).json({
-
-  reply: data.choices?.[0]?.message?.content || "I'm here with you."
-
-});
-
-    }
-
-KEY}`
-
-      
-
-      body: JSON.stringify({
-
-        model: "gpt-4o-mini",
-
-        messages: [systemMessage, ...messages],
-
-        temperature: 0.7
+        max_tokens: 300
 
       })
 
     });
 
-    const data = await response.json();
+    const data = await aiResponse.json();
 
-    res.status(200).json({
+    if (!aiResponse.ok) {
 
-      reply: data.choices?.[0]?.message?.content || "No response"
+      console.error("OpenAI error:", data);
 
-    });
+      return res.status(500).json({ error: "AI failed" });
+
+    }
+
+    const reply = data.choices?.[0]?.message?.content || "I'm here with you.";
+
+    // 🔥 SAVE TO SUPABASE
+
+    try {
+
+      await fetch(`${process.env.SUPABASE_URL}/rest/v1/conversations`, {
+
+        method: "POST",
+
+        headers: {
+
+          "Content-Type": "application/json",
+
+          "apikey": process.env.SUPABASE_ANON_KEY,
+
+          "Authorization": `Bearer ${process.env.SUPABASE_ANON_KEY}`
+
+        },
+
+        body: JSON.stringify({
+
+          user_id,
+
+          messages,
+
+          reply,
+
+          created_at: new Date().toISOString()
+
+        })
+
+      });
+
+    } catch (saveError) {
+
+      console.error("Save failed (non-blocking):", saveError);
+
+    }
+
+    return res.status(200).json({ reply });
 
   } catch (error) {
 
-    res.status(500).json({ error: "Server error" });
+    console.error("Server error:", error);
+
+    return res.status(500).json({ error: "Something went wrong" });
 
   }
 
 }
- 
