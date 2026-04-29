@@ -2,15 +2,21 @@
 
   "name": "pontepath",
 
-  "private": true,
+  "private": "scripts": {
 
-  "scripts": {
+  "dev": "next dev",
 
-    "build": "next build",
+  "build": "next build",
 
-    "start": "next start"
+  "start": "next start"
 
-  },
+}
+
+  
+
+    
+
+  
 
   "dependencies": {
 
