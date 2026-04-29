@@ -1,1 +1,25 @@
+{
 
+  "name": "pontepath",
+
+  "private": true,
+
+  "scripts": {
+
+    "build": "next build",
+
+    "start": "next start"
+
+  },
+
+  "dependencies": {
+
+    "next": "latest",
+
+    "react": "latest",
+
+    "react-dom": "latest"
+
+  }
+
+}
