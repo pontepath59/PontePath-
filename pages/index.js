@@ -2,27 +2,11 @@ export default function Home() {
 
   return (
 
-    <div style={{
+    <div style={{padding: 40}}>
 
-      display: "flex",
+      <h1>PontePath is Live 🙏</h1>
 
-      justifyContent: "center",
-
-      alignItems: "center",
-
-      height: "100vh",
-
-      fontFamily: "Arial",
-
-      flexDirection: "column",
-
-      textAlign: "center"
-
-    }}>
-
-      <h1>PontePath</h1>
-
-      <p>Your app is now working.</p>
+      <p>Your app is working.</p>
 
     </div>
 
