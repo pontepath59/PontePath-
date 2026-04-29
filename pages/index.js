@@ -22,7 +22,7 @@ export default function Home() {
 
       <h1>PontePath</h1>
 
-      <p>If you can see this, your app is working.</p>
+      <p>Your app is now working.</p>
 
     </div>
 
